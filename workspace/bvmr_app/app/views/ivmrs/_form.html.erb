@@ -1,0 +1,25 @@
+<%= form_for(@ivmr) do |f| %>
+  <% if @ivmr.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@ivmr.errors.count, "error") %> prohibited this ivmr from being saved:</h2>
+
+      <ul>
+      <% @ivmr.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :ivmr_value %><br>
+    <%= f.text_field :ivmr_value %>
+  </div>
+  <div class="field">
+    <%= f.label :api_time %><br>
+    <%= f.datetime_select :api_time %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

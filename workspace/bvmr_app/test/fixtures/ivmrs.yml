@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  ivmr_value: 1.5
+  api_time: 2015-07-14 15:36:51
+
+two:
+  ivmr_value: 1.5
+  api_time: 2015-07-14 15:36:51

@@ -1,0 +1,158 @@
+<div class="well">
+<!-- Navbar -->
+
+    <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="<%=ivmrs_path %>">Home</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+
+
+      </ul>
+
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+<p id="notice"><%= notice %></p>
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+</div>
+<% content_for :page_scripts do %>
+<script type="text/javascript">
+  //var javascript_side_json = <%=raw @rails_side_json %>;
+
+$(function () {
+  $.ajax({
+    url: '<%= url_for :controller => "ivmrs", :action => "test" %>',
+    dataType: 'json',
+    success: function(response){
+      var running_total = 0;
+      response.forEach(function (sampleSnapshot) { 
+       // sampleSnapshot[1] += running_total;
+        // running_total = sampleSnapshot[1];
+        sampleSnapshot[0] = new Date(sampleSnapshot[0]).getTime();
+      });
+
+      $('#container').highcharts({
+          chart: {
+              // type: 'line'
+              // zoomType: 'x'
+              type: 'spline'
+          },
+          title: {
+              text: 'IVMR'
+          },
+          subtitle: {
+              text: 'Source: WorldClimate.com'
+          },
+          xAxis: {
+              type: 'datetime'
+          },
+          yAxis: {
+              title: {
+                  text: 'Ivmrs(Rs)'
+              }
+          },
+
+              plotOptions: {
+  
+                              spline: {
+                marker: {
+                    enabled: true
+                }
+            }
+              },
+          series: [{
+              // type: 'area',
+              name: 'Ivmrs',
+              data: response
+
+          }]
+      });
+    }
+  });
+});  
+
+// $(function () {
+//   $.ajax({
+//     url: '/sync-ivmrs',
+//     dataType: 'json',
+//     success: function(response){
+//       // var running_total = 0;
+//       response.forEach(function (bvmrSnapshot) {
+//         // bvmrSnapshot[1] += running_total;
+//         // running_total = bvmrSnapshot[1];
+//         bvmrSnapshot[0] = new Date(bvmrSnapshot[0]).getTime();
+//       });
+
+//       $('#container').highcharts({
+//           chart: {
+//               // type: 'line'
+//               zoomType: 'x'
+//           },
+//           title: {
+//               text: 'Invoice Value Of Monthly Rentals'
+//           },
+//           subtitle: {
+//               text: 'Source: WorldClimate.com'
+//           },
+//           xAxis: {
+//               type: 'datetime'
+//           },
+//           yAxis: {
+//               title: {
+//                   text: 'IVMR(Rs)'
+//               }
+//           },
+//           legend: {
+//             enabled: false
+//           },
+//               plotOptions: {
+//                   area: {
+//                       fillColor: {
+//                           linearGradient: {
+//                               x1: 0,
+//                               y1: 0,
+//                               x2: 0,
+//                               y2: 1
+//                           },
+//                           stops: [
+//                               [0, Highcharts.getOptions().colors[0]],
+//                               [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+//                           ]
+//                       },
+//                       marker: {
+//                           radius: 2
+//                       },
+//                       lineWidth: 1,
+//                       states: {
+//                           hover: {
+//                               lineWidth: 1
+//                           }
+//                       },
+//                       threshold: null
+//                   }
+//               },
+//           series: [{
+//               type: 'area',
+//               name: 'IVMR',
+//               data: response
+
+//           }]
+//       });
+//     }
+//   });
+// });
+   
+</script>
+<% end %>

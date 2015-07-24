@@ -1,0 +1,91 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Sales</h1>
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+
+
+
+<% content_for :page_scripts do %>
+<script type="text/javascript">
+  //var javascript_side_json = <%=raw @rails_side_json %>;
+
+$(function () {
+  $.ajax({
+    url: '/samples',
+    dataType: 'json',
+    success: function(response){
+      var running_total = 0;
+      response.forEach(function (sampleSnapshot) { 
+       // sampleSnapshot[1] += running_total;
+        // running_total = sampleSnapshot[1];
+        sampleSnapshot[0] = new Date(sampleSnapshot[0]).getTime();
+      });
+
+      $('#container').highcharts({
+          chart: {
+              // type: 'line'
+              // zoomType: 'x'
+              type: 'spline'
+          },
+          title: {
+              text: 'Sales'
+          },
+          subtitle: {
+              text: 'Source: WorldClimate.com'
+          },
+          xAxis: {
+              type: 'datetime'
+          },
+          yAxis: {
+              title: {
+                  text: 'Sales($)'
+              }
+          },
+          // legend: {
+          //   enabled: false
+          // },
+              plotOptions: {
+                  // area: {
+                  //     fillColor: {
+                  //         linearGradient: {
+                  //             x1: 0,
+                  //             y1: 0,
+                  //             x2: 0,
+                  //             y2: 1
+                  //         },
+                  //         stops: [
+                  //             [0, Highcharts.getOptions().colors[0]],
+                  //             [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                  //         ]
+                  //     },
+                  //     marker: {
+                  //         radius: 2
+                  //     },
+                  //     lineWidth: 1,
+                  //     states: {
+                  //         hover: {
+                  //             lineWidth: 1
+                  //         }
+                  //     },
+                  //     threshold: null
+                  // }
+                              spline: {
+                marker: {
+                    enabled: true
+                }
+            }
+              },
+          series: [{
+              // type: 'area',
+              name: 'Sales',
+              data: response
+
+          }]
+      });
+    }
+  });
+});
+   
+</script>
+<% end %>

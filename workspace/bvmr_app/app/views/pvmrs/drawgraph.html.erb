@@ -1,0 +1,448 @@
+<div class="well">
+<!-- Navbar -->
+
+    <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false" >
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="<%=pvmrs_path %>">Home</a>
+    </div>
+
+
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><%= link_to 'Graph', action: :drawgraph %></li>
+
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <!-- <li><%= link_to 'Refresh now', '#' , :onclick => 'refresh()' %></li> -->
+    </ul>
+    </div><!-- /.navbar-collapse -->
+
+  </div><!-- /.container-fluid -->
+</nav>
+<p id="notice"><%= notice %></p>
+
+<div class="col-lg-6 col-md-12">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4>
+        <span>PVMR</span>
+        <button type="button" class="hidebutton btn btn-primary">Hide</button>
+      </h4>
+    </div>
+    <div class="panel-body graph-container">
+      <div id="container"  style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+    </div>
+  </div>
+</div>
+
+
+<div class="col-lg-6 col-md-12">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4>
+        <span>IVMR</span>
+        <button type="button" class="hidebutton btn btn-primary">Hide</button>
+      </h4>
+    </div>
+    <div class="panel-body graph-container">
+      <div id="container2"  style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+    </div>
+  </div>
+</div>
+
+
+<div class="col-lg-6 col-md-12">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4>
+        <span>BVMR</span>
+        <button type="button" class="hidebutton btn btn-primary">Hide</button>
+      </h4>
+    </div>
+    <div class="panel-body graph-container">
+      <div id="container3"  style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="col-lg-6 col-md-12">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4>
+        <span>PVMR , IVMR and BVMR</span>
+        <button type="button" class="hidebutton btn btn-primary">Hide</button>
+      </h4>
+    </div>
+    <div class="panel-body graph-container">
+      <div id="container4"  style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+    </div>
+  </div>
+</div>
+<li><%= link_to 'Refresh now', action: :drawgraph %></li>
+
+
+
+<!-- <div class="row">
+  
+  
+  
+  <div id="container2" class="col-lg-6 col-md-12" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+</div>
+
+<div class="row">
+  <div id="container3" class="col-lg-6 col-md-12" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+  <div id="container4" class="col-lg-6 col-md-12" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+</div> -->
+
+
+
+</div>
+<% content_for :page_scripts do %>
+<script type="text/javascript">
+  //var javascript_side_json = <%=raw @rails_side_json %>;
+
+
+//   $("pvmr_button").click(function(){
+//     $("container").toggleClass("main");
+// });
+function refresh(){
+  $.ajax({
+    url: '<%= url_for :controller => "ivmrs", :action => "test" %>',
+    success: function(){
+      window.location.reload();
+    }
+  })
+  
+}
+
+setInterval(function () {
+   window.location.reload();
+}, 1000*3600);
+
+var wireEvents = function(){
+  $(".hidebutton").click(function(){
+    $(this).parents('.panel').find('.graph-container').toggleClass('hide');
+
+
+
+    
+if ($(this).text() == "Hide") 
+  { 
+     $(this).text("Show"); 
+  } 
+  else 
+  { 
+     $(this).text("Hide"); 
+  }; 
+
+  });
+};
+
+$(function () {
+  wireEvents();
+  var temp_series=[];
+
+  var multiSeriesChart = new Highcharts.Chart({
+        chart: {
+            type: 'spline',
+            renderTo: 'container4'
+        },
+        title: {
+            text: 'PVMR ,BVMR AND IVMR'
+        },
+        subtitle: {
+            text: 'Irregular time data in Highcharts JS'
+        },
+        xAxis: {
+            type: 'datetime',
+            dateTimeLabelFormats: { // don't display the dummy year
+                month: '%e. %b',
+                year: '%b'
+            },
+            title: {
+                text: 'Date'
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Monthly Rental (Rs)'
+            },
+            min: 0
+        },
+        tooltip: {
+            headerFormat: '<b>{series.name}</b><br>',
+            pointFormat: '{point.x:%e. %b}: Rs {point.y:.2f} '
+        },
+
+        plotOptions: {
+            spline: {
+                marker: {
+                    enabled: true
+                }
+            }
+        },
+
+        series: temp_series
+    });
+
+
+  $.ajax({
+    url: '/graph',
+    dataType: 'json',
+    success: function(response){
+      var running_total = 3000000;
+      response.forEach(function (pvmrSnapshot) {
+        pvmrSnapshot[1] += running_total;
+        running_total = pvmrSnapshot[1];
+        pvmrSnapshot[0] = new Date(pvmrSnapshot[0]).getTime();
+      });
+
+      var seriesData = {
+        name: 'PVMR',
+        data: response
+      };
+
+      multiSeriesChart.addSeries(seriesData);
+
+      // $('#container').highcharts({
+      //     chart: {
+      //         // type: 'line'
+      //         zoomType: 'x'
+      //     },
+      //     title: {
+      //         text: 'Projected Value Of Monthly Rentals'
+      //     },
+      //     subtitle: {
+      //         text: 'Source: WorldClimate.com'
+      //     },
+      //     xAxis: {
+      //         type: 'datetime'
+      //     },
+      //     yAxis: {
+      //         title: {
+      //             text: 'PVMR(Rs)'
+      //         }
+      //     },
+      //     legend: {
+      //       enabled: false
+      //     },
+      //         plotOptions: {
+      //             area: {
+      //                 fillColor: {
+      //                     linearGradient: {
+      //                         x1: 0,
+      //                         y1: 0,
+      //                         x2: 0,
+      //                         y2: 1
+      //                     },
+      //                     stops: [
+      //                         [0, Highcharts.getOptions().colors[0]],
+      //                         [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+      //                     ]
+      //                 },
+      //                 marker: {
+      //                     radius: 2
+      //                 },
+      //                 lineWidth: 1,
+      //                 states: {
+      //                     hover: {
+      //                         lineWidth: 1
+      //                     }
+      //                 },
+      //                 threshold: null
+      //             }
+      //         },
+      //     series: [{
+      //         type: 'area',
+      //         name: 'PVMR',
+      //         data: response
+
+      //     }]
+      // });
+
+      $('#container').highcharts({
+          chart: {
+              // type: 'line'
+              // zoomType: 'x'
+              type: 'spline'
+          },
+          title: {
+              text: 'PVMR'
+          },
+          subtitle: {
+              text: 'Source: WorldClimate.com'
+          },
+          xAxis: {
+              type: 'datetime'
+          },
+          yAxis: {
+
+                  labels: {
+                          formatter: function () {
+                          return this.value/1000000 + 'M';
+                          }
+                          },
+              title: {
+                  text: 'Pvmrs(Rs)'
+              }
+          },
+
+              plotOptions: {
+  
+                              spline: {
+                marker: {
+                    enabled: true
+                }
+            }
+              },
+          series: [{
+              // type: 'area',
+              name: 'Pvmrs',
+              data: response
+
+          }]
+      });    
+
+    }
+  });
+
+
+  $.ajax({
+    url: '<%= url_for :controller => "ivmrs", :action => "test" %>',
+    dataType: 'json',
+    success: function(response){
+      var running_total = 0;
+      response.forEach(function (sampleSnapshot) { 
+       // sampleSnapshot[1] += running_total;
+        // running_total = sampleSnapshot[1];
+        sampleSnapshot[0] = new Date(sampleSnapshot[0]).getTime();
+      });
+
+      var seriesData = {
+        name: 'IVMR',
+        data: response
+      };
+
+      multiSeriesChart.addSeries(seriesData);
+
+      $('#container2').highcharts({
+          chart: {
+              // type: 'line'
+              // zoomType: 'x'
+              type: 'spline'
+          },
+          title: {
+              text: 'IVMR'
+          },
+          subtitle: {
+              text: 'Source: WorldClimate.com'
+          },
+          xAxis: {
+              type: 'datetime'
+          },
+          yAxis: {
+              title: {
+                  text: 'Ivmrs(Rs)'
+              }
+          },
+
+              plotOptions: {
+  
+                              spline: {
+                marker: {
+                    enabled: true
+                }
+            }
+              },
+          series: [{
+              // type: 'area',
+              name: 'Ivmrs',
+              data: response
+
+          }]
+      });
+    }
+  });
+
+  $.ajax({
+    url: '<%= url_for :controller => "ivmrs", :action => "drawgraph_bvmr" %>',
+    dataType: 'json',
+    success: function(response){
+      var running_total = 0;
+      response.forEach(function (sampleSnapshot) { 
+       // sampleSnapshot[1] += running_total;
+        // running_total = sampleSnapshot[1];
+        sampleSnapshot[0] = new Date(sampleSnapshot[0]).getTime();
+      });
+
+      var seriesData = {
+        name: 'BVMR',
+        data: response
+      };
+
+      multiSeriesChart.addSeries(seriesData);
+
+      $('#container3').highcharts({
+          chart: {
+              // type: 'line'
+              // zoomType: 'x'
+              type: 'spline'
+          },
+          title: {
+              text: 'BVMR'
+          },
+          subtitle: {
+              text: 'Source: WorldClimate.com'
+          },
+          xAxis: {
+              type: 'datetime'
+          },
+          yAxis: {
+                  labels: {
+          formatter: function () {
+              return this.value / 1000000 + 'M';
+          }
+      },
+              title: {
+                  text: 'Bvmrs(Rs)'
+              }
+          },
+
+              plotOptions: {
+  
+                              spline: {
+                marker: {
+                    enabled: true
+                }
+            }
+              },
+          series: [{
+              // type: 'area',
+              name: 'Bvmrs',
+              data: response
+
+          }]
+      });
+    }
+  });
+});
+
+
+
+
+
+   
+</script>
+<% end %>
